@@ -89,7 +89,7 @@ struct ContentView: View {
             newItem.timestamp = Date()
             newItem.category = 1
             newItem.name = "\(Date())"
-            newItem.text = "Init - \(Date())"
+            newItem.text = "0"
 
             do {
                 try viewContext.save()

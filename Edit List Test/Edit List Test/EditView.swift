@@ -10,7 +10,7 @@ import SwiftUI
 struct EditView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
-    private var book: Item
+    @ObservedObject private var book: Item
     
     init(book: Item) {
         print("Init hit")
@@ -24,7 +24,7 @@ struct EditView: View {
             Text("Text - \(book.text!)")
             
             Button {
-                book.text = "New - \(Date())"
+                book.text = book.text! + " " + "\(Int.random(in: 1...9))"
                 
                 do {
                     try viewContext.save()
