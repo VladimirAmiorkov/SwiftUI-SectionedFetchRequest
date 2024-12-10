@@ -10,26 +10,64 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
+    
+    // Test 1 - start
+    
+//    @FetchRequest(
+//        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+//        animation: .default)
+//    private var items: FetchedResults<Item>
+    
+    // Test 1 - end
+    
+    // Test 2 - start
+    @SectionedFetchRequest<Int16, Item>(
+        sectionIdentifier: \.category,
+        sortDescriptors: [SortDescriptor(\.category)]
+    )
+    private var items: SectionedFetchResults<Int16, Item>
+    
+    // Test 2 - end
+   
 
     var body: some View {
         NavigationView {
             List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        EditView(book: item)
-                    } label: {
-                        VStack {
-                            Text(item.timestamp!, formatter: itemFormatter)
-                            Text("Text - \(item.text!)")
+                // Test 1 - start
+                
+//                ForEach(items) { item in
+//                    NavigationLink {
+//                        EditView(book: item)
+//                    } label: {
+//                        VStack {
+//                            Text(item.timestamp!, formatter: itemFormatter)
+//                            Text("Text - \(item.text!)")
+//                        }
+//                    }
+//                }
+                
+                // Test 1 - end
+
+                // Test 2 - start
+                
+                ForEach(items) { section in
+                    Section {
+                        ForEach(section) { item in
+                            NavigationLink {
+                                EditView(book: item)
+                            } label: {
+                                VStack {
+                                    Text(item.timestamp!, formatter: itemFormatter)
+                                    Text("Text - \(item.text!)")
+                                }
+                            }
                         }
+                    } header: {
+                        Text("ID: \(section.id)")
                     }
                 }
-                .onDelete(perform: deleteItems)
+                
+                // Test 2 - end
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -49,22 +87,9 @@ struct ContentView: View {
         withAnimation {
             let newItem = Item(context: viewContext)
             newItem.timestamp = Date()
-            newItem.text = "Init - \(Date().timeIntervalSince1970)"
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
+            newItem.category = 1
+            newItem.name = "\(Date())"
+            newItem.text = "Init - \(Date())"
 
             do {
                 try viewContext.save()
